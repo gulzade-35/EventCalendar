@@ -27,7 +27,7 @@ Hızlı kullanıcı etkileşimlerinde veritabanına mükerrer (çift) kayıt at�
 Modal üzerinden silme ve güncelleme işlemlerinde karşılaşılan aria-hidden hataları ve "takılı kalan backdrop" sorunları, özel bir temizlik fonksiyonu (closeModalCleanly) ile çözülmüştür. İşlem sonrası odaklanılan element ve modal kalıntıları DOM'dan tamamen temizlenmektedir.
 
 🏗️ Kullanılan Teknolojiler
-|Katman / Amaç    | Teknoloji                   |
+|Katman          | Teknoloji                   |
 |-------------    |------------------           |
 | Backend         | 	ASP.NET Core 6.0          |
 | API Tüketimi    | HttpClient / RapidAPI       |
