@@ -1,4 +1,5 @@
-📅 EventCalendar - ASP.NET MVC & FullCalendar 5+
+📅 EventCalendar - ASP.NET MVC & FullCalendar
+
 Bu proje, ASP.NET MVC mimarisi üzerinde FullCalendar kütüphanesini kullanarak dinamik, sürükle-bırak destekli ve veritabanı entegreli bir etkinlik yönetim sistemi sunar. Projenin temel amacı, kullanıcıların etkinliklerini görsel bir takvim üzerinde yönetmelerini sağlarken, arka planda veri tutarlılığını ve performanslı senkronizasyonu korumaktır.
 
 🚀 Öne Çıkan Özellikler
