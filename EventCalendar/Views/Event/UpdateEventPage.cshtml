@@ -1,0 +1,90 @@
+﻿@model EventCalendar.Entities.Event
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+@Html.Partial("/Views/Layout/PartialHead.cshtml")
+
+<body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+
+        @Html.Partial("/Views/Layout/PartialNavbar.cshtml")
+        @Html.Partial("/Views/Layout/PartialSidebar.cshtml")
+
+        <div class="content-wrapper">
+
+            <section class="content-header">
+                <h1>Etkinlik Düzenle</h1>
+            </section>
+
+            <section class="content">
+                <div class="card card-primary">
+
+                    <form action="/Event/UpdateEventPage" method="post">
+                        @Html.AntiForgeryToken()
+                        @Html.HiddenFor(x => x.EventId)
+
+                        <div class="card-body">
+
+                            <!-- Başlık -->
+                            <div class="form-group">
+                                <label>Etkinlik Başlığı</label>
+                                @Html.TextBoxFor(x => x.Title, new { @class = "form-control" })
+                            </div>
+
+                            <!-- Kategori -->
+                            <div class="form-group">
+                                <label>Kategori</label>
+                                <select name="CategoryId" class="form-control">
+                                    @foreach (var cat in ViewBag.Categories)
+                                    {
+                                        <option value="@cat.CategoryId"
+                                                @(cat.CategoryId == Model.CategoryId ? "selected" : "")>
+                                            @cat.CategoryName
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+
+                            <!-- Tarihler -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>Başlangıç</label>
+                                    <input class="form-control"
+                                           value="@(Model.StartDate?.ToString("dd.MM.yyyy"))"
+                                           readonly />
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label>Bitiş</label>
+                                    <input class="form-control"
+                                           value="@(Model.EndDate?.ToString("dd.MM.yyyy"))"
+                                           readonly />
+                                </div>
+                            </div>
+
+                            <small class="text-muted">
+                                * Tarihler takvim üzerinden değiştirilir
+                            </small>
+
+                        </div>
+
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">Kaydet</button>
+                            <a href="/Event/EventList" class="btn btn-secondary float-right">İptal</a>
+                        </div>
+
+                    </form>
+
+                </div>
+            </section>
+        </div>
+
+        @Html.Partial("/Views/Layout/PartialFooter.cshtml")
+    </div>
+
+    @Html.Partial("/Views/Layout/PartialScript.cshtml")
+</body>
+</html>

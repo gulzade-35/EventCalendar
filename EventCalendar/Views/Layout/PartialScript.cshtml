@@ -1,0 +1,253 @@
+﻿﻿
+<script src="/Content/AdminLTE-3.1.0/plugins/jquery/jquery.min.js"></script>
+<script src="/Content/AdminLTE-3.1.0/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/Content/AdminLTE-3.1.0/plugins/jquery-ui/jquery-ui.min.js"></script>
+<script src="/Content/AdminLTE-3.1.0/dist/js/adminlte.min.js"></script>
+<script src="/Content/AdminLTE-3.1.0/plugins/moment/moment.min.js"></script>
+<script src="/Content/AdminLTE-3.1.0/plugins/fullcalendar/main.js"></script>
+
+<script src="/Content/AdminLTE-3.1.0/dist/js/demo.js"></script>
+
+<script>
+    $(function () {
+        var calendarEl = document.getElementById('calendar');
+        var containerEl = document.getElementById('external-events');
+        var calendar; // Takvim nesnesine dışarıdan erişebilmek için
+        var selectedColorClass = 'bg-primary';
+
+        // ÇİFT KAYDI ENGELLEYEN KİLİTLER
+        var isDraggableInitialized = false;
+        var isProcessing = false;
+
+        // Bootstrap renklerini hex koduna çeviren yardımcı fonksiyon
+        function getBootstrapColor(cls) {
+            const map = {
+                "bg-primary": "#007bff", "bg-success": "#28a745",
+                "bg-danger": "#dc3545", "bg-warning": "#ffc107", "bg-info": "#17a2b8"
+            };
+            return map[cls] || "#007bff";
+        }
+
+        // --- RENK SEÇİMİ VE EKLEME ---
+        $(document).off('click', '.color-opt').on('click', '.color-opt', function (e) {
+            e.preventDefault();
+            selectedColorClass = $(this).data('color');
+            var iconColor = $(this).css('color');
+            $('#add-new-category').css({ 'background-color': iconColor, 'border-color': iconColor });
+        });
+
+        // --- 2. Kategori Paneli İşlemleri ---
+
+        // Yeni Kategori Ekleme Butonu (Senin Index'teki kodu buraya güvenli aldık)
+        $('#add-new-category').off('click').on('click', function () {
+            var catName = $('#new-category-name').val();
+            if (!catName) return;
+            $.post('/Event/AddCategory', { CategoryName: catName, CategoryColor: selectedColorClass }, function (res) {
+                if (res.success) {
+                    $('#new-category-name').val('');
+                    refreshCategoryList();
+                }
+            });
+        });
+
+        // --- 2. Kategori Paneli İşlemleri ---
+        function addCategoryToDOM(item) {
+            if (!containerEl) return;
+            var categoryEl = document.createElement('div');
+            categoryEl.className = 'external-event';
+            categoryEl.textContent = item.CategoryName;
+            categoryEl.dataset.id = item.CategoryId;
+            // getBootstrapColor fonksiyonun burada kullanılıyor
+            var bgColor = item.CategoryColor.startsWith('#') ? item.CategoryColor : getBootstrapColor(item.CategoryColor);
+            categoryEl.dataset.color = bgColor;
+            categoryEl.style.backgroundColor = bgColor;
+            categoryEl.style.color = '#fff';
+            categoryEl.style.cursor = 'move';
+            containerEl.appendChild(categoryEl);
+        }
+
+        function refreshCategoryList() {
+            if (!containerEl) return;
+            containerEl.innerHTML = '';
+            $.get('/Event/GetCategories', function (data) {
+                data.forEach(function (item) { addCategoryToDOM(item); });
+
+                // KİLİT MEKANİZMASI: Eğer Draggable zaten kurulduysa tekrar kurma!
+                if (!isDraggableInitialized) {
+                    new FullCalendar.Draggable(containerEl, {
+                        itemSelector: '.external-event',
+                        eventData: function (eventEl) {
+                            return {
+                                title: eventEl.textContent,
+                                allDay: true,
+                                backgroundColor: eventEl.dataset.color,
+                                borderColor: eventEl.dataset.color,
+                                extendedProps: {
+                                    categoryId: eventEl.dataset.id,
+                                    categoryColor: eventEl.dataset.color
+                                }
+                            };
+                        }
+                    });
+                    isDraggableInitialized = true; // Kuruldu olarak işaretle
+                }
+            });
+        }
+
+        /*refreshCategoryList();*/
+
+        // --- 3. Takvim Kurulumu ---
+        if (calendarEl) {
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                displayEventTime: false,
+                nextDayThreshold: '00:00:00',
+                themeSystem: 'bootstrap',
+                editable: true,
+                droppable: true,
+                events: '/Event/GetEvents',
+
+                eventDidMount: function (info) {
+                    var color = info.event.extendedProps.categoryColor || info.event.backgroundColor;
+                    if (color) {
+                        info.el.style.backgroundColor = color;
+                        info.el.style.borderColor = color;
+                        info.el.style.color = '#fff';
+                    }
+                },
+
+                eventReceive: function (info) {
+                    if (isProcessing) return;
+                    isProcessing = true;
+
+                    // 1. Sürüklenen geçici elementin bilgilerini alalım
+                    var draggedEvent = info.event;
+                    var title = draggedEvent.title;
+                    var start = draggedEvent.start.toISOString();
+                    var catId = draggedEvent.extendedProps.categoryId;
+
+                    // Renk bg-danger gibi geliyorsa onu HEX koduna çevirelim
+                    var rawColor = draggedEvent.extendedProps.categoryColor || draggedEvent.backgroundColor;
+                    var hexColor = getBootstrapColor(rawColor);
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '/Event/AddEvent',
+                        data: {
+                            title: title,
+                            start: start,
+                            categoryId: catId
+                        },
+                        success: function (res) {
+                            isProcessing = false;
+                            if (res.success) {
+                                // 2. KRİTİK ADIM: FullCalendar'ın kendi oluşturduğu (yeşil/sorunlu) kopyayı SİL
+                                draggedEvent.remove();
+
+                                // 3. Veritabanından gelen gerçek ID ile yeni ve temiz bir etkinlik EKLE
+                                calendar.addEvent({
+                                    id: res.id,
+                                    title: title,
+                                    start: start,
+                                    allDay: true,
+                                    backgroundColor: hexColor,
+                                    borderColor: hexColor,
+                                    textColor: '#fff',
+                                    extendedProps: {
+                                        categoryId: catId,
+                                        categoryColor: hexColor
+                                    }
+                                });
+
+                                console.log("Geçici kopya temizlendi, veritabanı kaydı (ID: " + res.id + ") eklendi.");
+                            } else {
+                                alert('Hata: ' + res.message);
+                                info.revert();
+                            }
+                        },
+                        error: function () {
+                            isProcessing = false;
+                            info.revert();
+                        }
+                    });
+                },
+
+            // TAKVİM İÇİNDE TAŞIYINCA VEYA UZATINCA (GÜNCELLEME)
+            eventDrop: function (info) { updateEventOnServer(info); },
+            eventResize: function (info) { updateEventOnServer(info); },
+
+            eventClick: function (info) {
+                $('#modalEventId').val(info.event.id);
+                $('#modalEventTitle').val(info.event.title);
+                $('#modalEventDate').val(moment(info.event.start).format('DD.MM.YYYY'));
+                $('#eventModal').modal('show');
+            }
+            });
+            calendar.render();
+            refreshCategoryList(); // Sadece takvim varsa kategorileri yükle
+        }
+
+        function updateEventOnServer(info) {
+            var eventId = info.event.id;
+            if (!eventId || eventId == "0") return;
+
+            $.post('/Event/UpdateEventDate', {
+                id: eventId,
+                start: info.event.start.toISOString(),
+                end: info.event.end ? info.event.end.toISOString() : info.event.start.toISOString()
+            }).fail(function () {
+                alert("Güncelleme başarısız!");
+                info.revert();
+            });
+        }
+
+        // --- MODAL TEMİZLEME VE İŞLEMLER ---
+        function closeModalCleanly() {
+            $('#eventModal').modal('hide');
+            $('body').removeClass('modal-open');
+            $('.modal-backdrop').remove();
+        }
+
+        // --- 4. Ortak Silme ve Güncelleme Butonları ---
+
+        // Silme Butonu (Modal içindeki "Sil" butonu için)
+        $('#btnDeleteEvent').on('click', function () {
+            var eventId = $('#modalEventId').val();
+            console.log("Silinmeye çalışılan ID: " + eventId); // Console'da ne yazdığına bak
+
+            if (!eventId) {
+                alert("ID bulunamadı, silme yapılamaz!");
+                return;
+            }
+
+            if (confirm("Silmek istediğinize emin misiniz?")) {
+                $.post('/Event/DeleteEvent', { id: eventId }, function (res) {
+                    if (res.success) {
+                        var event = calendar.getEventById(eventId);
+                        if (event) event.remove();
+                        closeModalCleanly();
+                        refreshCategoryList();
+                    } else {
+                        alert("Sunucu silme işlemini reddetti.");
+                    }
+                });
+            }
+        });
+
+        // Başlık Güncelleme
+        $('#btnUpdateEvent').off('click').on('click', function () {
+            var id = $('#modalEventId').val();
+            var newTitle = $('#modalEventTitle').val();
+            $.post('/Event/UpdateEventTitle', { id: id, title: newTitle }, function (res) {
+                if (res.success) {
+                    calendar.getEventById(id).setProp('title', newTitle);
+                    closeModalCleanly();
+                }
+            });
+        });
+    });
+</script>

@@ -1,0 +1,99 @@
+﻿@model EventCalendar.Entities.Category
+
+@{
+    ViewBag.Title = "UpdateCategory";
+    Layout = "~/Views/Layout/Index.cshtml";
+}
+
+<style>
+    /* Seçili olan rengi belli etmek için */
+    .selected-color {
+        border: 4px solid #333 !important;
+        transform: scale(1.15);
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+
+    .color-option {
+        cursor: pointer;
+        transition: 0.3s;
+        margin-right: 10px;
+    }
+</style>
+
+<div class="content-wrapper">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">Kategori Düzenle</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="content">
+        <div class="container-fluid">
+
+            @using (Html.BeginForm("UpdateCategory", "Category", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(m => m.CategoryId)
+
+                @* Hidden input, seçilen rengi tutuyor *@
+                @Html.HiddenFor(m => m.CategoryColor, new { id = "selected_color_input" })
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.CategoryName, "Kategori Adı")
+                    @Html.TextBoxFor(m => m.CategoryName, new { @class = "form-control" })
+                </div>
+
+                <div class="form-group">
+                    <label>Renk Seçin</label>
+                    <div class="d-flex">
+                        <div class="color-option btn btn-default" data-color="bg-primary" title="Mavi">
+                            <i class="fas fa-circle fa-2x text-primary"></i>
+                        </div>
+                        <div class="color-option btn btn-default" data-color="bg-success" title="Yeşil">
+                            <i class="fas fa-circle fa-2x text-success"></i>
+                        </div>
+                        <div class="color-option btn btn-default" data-color="bg-danger" title="Kırmızı">
+                            <i class="fas fa-circle fa-2x text-danger"></i>
+                        </div>
+                        <div class="color-option btn btn-default" data-color="bg-warning" title="Sarı">
+                            <i class="fas fa-circle fa-2x text-warning"></i>
+                        </div>
+                        <div class="color-option btn btn-default" data-color="bg-info" title="Turkuaz">
+                            <i class="fas fa-circle fa-2x text-info"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Değişiklikleri Kaydet</button>
+                <a href="@Url.Action("CategoryList", "Category")" class="btn btn-secondary">İptal</a>
+            }
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    <script>
+    $(document).ready(function () {
+        var currentColor = '@(Model?.CategoryColor ?? "")';
+        if (currentColor) {
+            $('.color-option').each(function () {
+                if ($(this).data('color') === currentColor) {
+                    $(this).addClass('selected-color');
+                    $('#selected_color_input').val(currentColor);
+                }
+            });
+        }
+
+        $('.color-option').click(function () {
+            $('.color-option').removeClass('selected-color');
+            $(this).addClass('selected-color');
+            var selected = $(this).data('color');
+            $('#selected_color_input').val(selected);
+        });
+    });
+    </script>
+}

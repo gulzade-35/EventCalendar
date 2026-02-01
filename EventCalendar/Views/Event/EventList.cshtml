@@ -1,0 +1,143 @@
+﻿﻿@model List<EventCalendar.Entities.Event>
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+@Html.Partial("/Views/Layout/PartialHead.cshtml")
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+
+        <!-- Preloader -->
+        <div class="preloader flex-column justify-content-center align-items-center">
+            <img class="animation__shake" src="dist/img/AdminLTELogo.png" alt="AdminLTELogo" height="60" width="60">
+        </div>
+
+        <!-- Navbar -->
+        @Html.Partial("/Views/Layout/PartialNavbar.cshtml")
+        <!-- /.navbar -->
+        <!-- Main Sidebar Container -->
+        @Html.Partial("/Views/Layout/PartialSidebar.cshtml")
+
+        <div class="content-wrapper">
+            <div class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1 class="m-0"></h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <section class="col-lg-12 connectedSortable">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        <i class="ion ion-clipboard mr-1"></i>
+                                        Kategori Listesi
+                                    </h3>
+                                </div>
+                                <div class="card-body table-responsive">
+                                    <table class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 10px">#</th>
+                                                <th>Başlık</th>
+                                                <th>Başlangıç Tarihi</th>
+                                                <th>Bitiş Tarihi</th>
+                                                <th>Kategori</th>
+                                                <th>Güncelle/Sil</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @{
+                                                var colorMap = new Dictionary<string, string>
+                                                                                                                         {
+                                                     {"bg-primary", "#007bff"},
+                                                     {"bg-success", "#28a745"},
+                                                     {"bg-warning", "#ffc107"},
+                                                     {"bg-danger", "#dc3545"},
+                                                     {"bg-info", "#17a2b8"}
+                                                 };
+                                            }
+                                            @foreach (var item in Model)
+                                            {
+                                                string categoryColorKey = item.Category?.CategoryColor;
+                                                string hexColor = "#000000";
+
+                                                if (!string.IsNullOrEmpty(categoryColorKey) && colorMap.ContainsKey(categoryColorKey))
+                                                {
+                                                    hexColor = colorMap[categoryColorKey];
+                                                }
+
+                                                <tr id="event-row-@item.EventId">
+                                                    <td>@item.EventId</td>
+                                                    <td>@item.Title</td>
+                                                    <td>@(item.StartDate.HasValue ? item.StartDate.Value.ToString("dd.MM.yyyy") : "-")</td>
+                                                    <td>@(item.EndDate.HasValue ? item.EndDate.Value.ToString("dd.MM.yyyy") : "-")</td>
+                                                    <td style="color:@hexColor; font-weight:bold;">
+                                                        @(item.Category == null ? "-" : item.Category.CategoryName)
+                                                    </td>
+                                                    <td style="display: flex; gap: 10px;">
+                                                        <a href="@Url.Action("UpdateEventPage", "Event", new { id = item.EventId })" class="btn btn-sm btn-outline-success">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        <button type="button" class="btn btn-sm btn-outline-danger delete-event-btn" data-event-id="@item.EventId">
+                                                            <i class="fas fa-trash-alt"></i> Sil
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </section>
+        </div>
+        @Html.Partial("/Views/Layout/PartialFooter.cshtml")
+        <aside class="control-sidebar control-sidebar-dark">
+        </aside>
+    </div>
+    @Html.Partial("/Views/Layout/PartialScript.cshtml")
+</body>
+</html>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Tablodaki "Sil" butonuna tıklandığında
+        $('.delete-event-btn').on('click', function () {
+            var btn = $(this);
+            var id = btn.data('event-id'); // data-event-id attribute'undan ID'yi alıyoruz
+
+            if (confirm("Bu etkinliği silmek istediğinize emin misiniz?")) {
+                $.ajax({
+                    url: '/Event/DeleteEvent',
+                    type: 'POST',
+                    data: { id: id },
+                    success: function (response) {
+                        if (response.success) {
+                            // Başarılıysa satırı animasyonla kaldır
+                            $('#event-row-' + id).fadeOut(500, function () {
+                                $(this).remove();
+                            });
+                        } else {
+                            alert("Hata: " + (response.message || "Silme işlemi başarısız."));
+                        }
+                    },
+                    error: function () {
+                        alert("Sunucuyla iletişim kurulurken bir hata oluştu.");
+                    }
+                });
+            }
+        });
+    });
+</script>
