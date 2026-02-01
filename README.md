@@ -14,23 +14,11 @@ Kilit (Mutex) Mekanizması: JavaScript tarafında aynı anda birden fazla kayıt
 
 🛠️ **Teknik Detaylar ve Yapılan İyileştirmeler**
 
-1. Sürükle-Bırak Senkronizasyon Çözümü (Görsel Tutarlılık)
-
-FullCalendar'da harici bir elementi takvime bıraktığınızda, kütüphane otomatik olarak "geçici" bir etkinlik oluşturur. Bu durum, AJAX ile veritabanına kayıt atılırken takvimde aynı etkinliğin iki kez görünmesine (biri veritabanından gelen, diğeri FullCalendar'ın kendi oluşturduğu) neden olabiliyordu.
-
-Çözüm: eventReceive olayında FullCalendar'ın oluşturduğu geçici kopyayı remove() ile sildik ve AJAX'tan dönen gerçek veritabanı ID'si ile yeni, "resmi" etkinliği addEvent ile takvime ekledik. Böylece kullanıcı görsel bir takılma yaşamadan veritabanıyla tam uyumlu bir deneyim elde etti.
-
-2. Bootstrap Renk Dönüşümü (getBootstrapColor)
-
-AdminLTE ve Bootstrap temalarında kullanılan renk sınıfları (bg-primary, bg-success) FullCalendar tarafından doğrudan tanınmaz. Projede yazdığımız yardımcı fonksiyon ile bu sınıflar gerçek zamanlı olarak Hex kodlarına çevrilerek takvimin görsel bütünlüğü korunmuştur.
-
-4. Kayıt Çakışmalarının Önlenmesi (isProcessing)
-
-Hızlı kullanıcı etkileşimlerinde veritabanına mükerrer (çift) kayıt atılmasını önlemek için JavaScript tarafında bir "İşlem Kilidi" (Processing Lock) mekanizması kurulmuştur. Bir AJAX isteği tamamlanmadan ikincisinin tetiklenmesi bu sayede engellenmiştir.
-
-5. Modal ve Erişilebilirlik Yönetimi
-
-Modal üzerinden silme ve güncelleme işlemlerinde karşılaşılan aria-hidden hataları ve "takılı kalan backdrop" sorunları, özel bir temizlik fonksiyonu (closeModalCleanly) ile çözülmüştür. İşlem sonrası odaklanılan element ve modal kalıntıları DOM'dan tamamen temizlenmektedir.
+|Katman / Amaç          | Teknoloji / Yaklaşım       
+|-------------    |------------------          
+| Eşzamanlılık Kontrolü        | 	isProcessing & Mutex Logic: Hızlı sürükle-bırak işlemlerinde veritabanına mükerrer (çift) kayıt atılmasını engelleyen kilit mekanizması.     
+| Veri Senkronizasyonu        | 	Optimistic UI vs Real-time Sync: Geçici kopyaların (shadow events) temizlenip, sunucu onaylı gerçek verilerin takvime dinamik enjeksiyonu.  
+| Renk Adaptasyonu    | 	Dynamic CSS Bridge: Bootstrap class yapılarını FullCalendar'ın anlayacağı Hex kodlarına dinamik olarak haritalayan yardımcı katman. 
 
 🏗️ Kullanılan Teknolojiler
 
