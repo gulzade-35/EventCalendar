@@ -16,9 +16,10 @@ Kilit (Mutex) Mekanizması: JavaScript tarafında aynı anda birden fazla kayıt
 
 |Katman / Amaç          | Teknoloji / Yaklaşım       
 |-------------    |------------------          
-| Eşzamanlılık Kontrolü        | 	isProcessing & Mutex Logic: Hızlı sürükle-bırak işlemlerinde veritabanına mükerrer (çift) kayıt atılmasını engelleyen kilit mekanizması.     
+| Otomatik Senkronizasyon      | 	Event Resize & Drop: Etkinliklerin takvim üzerinde sürüklenerek veya boyutlandırılarak tarihlerinin anlık (otomatik) güncellenmesi.    
+| Concurrency (Eşzamanlılık)      | 	isProcessing & Mutex Logic: Hızlı sürükle-bırak işlemlerinde veritabanına mükerrer (çift) kayıt atılmasını engelleyen kilit mekanizması.     
 | Veri Senkronizasyonu        | 	Optimistic UI vs Real-time Sync: Geçici kopyaların (shadow events) temizlenip, sunucu onaylı gerçek verilerin takvime dinamik enjeksiyonu.  
-| Renk Adaptasyonu    | 	Dynamic CSS Bridge: Bootstrap class yapılarını FullCalendar'ın anlayacağı Hex kodlarına dinamik olarak haritalayan yardımcı katman. 
+| Renk Adaptasyonu    | 	Dynamic Color Mapping: Bootstrap sınıflarını (bg-danger vb.) FullCalendar HEX kodlarına dönüştüren yardımcı fonksiyon.
 
 🏗️ Kullanılan Teknolojiler
 
