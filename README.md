@@ -40,7 +40,9 @@ Partial Scripts: Karmaşıklığı önlemek adına JavaScript mantığının ta�
 
 Context: Entity Framework veritabanı bağlantı ve tablo tanımlamaları.
 
-**Ekran Görüntüleri**
+:framed_picture: **Ekran Görüntüleri**
+
+1.Kategori Ekleme, Silme ve Güncelleme
 
 ![Image](https://github.com/user-attachments/assets/6eb86e77-e945-446b-9ce6-82086ae8584f)
 
