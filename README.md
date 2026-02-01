@@ -42,8 +42,6 @@ Context: Entity Framework veritabanı bağlantı ve tablo tanımlamaları.
 
 :framed_picture: **Ekran Görüntüleri**
 
-1.Kategori Ekleme, Silme ve Güncelleme
-
 ![Image](https://github.com/user-attachments/assets/6eb86e77-e945-446b-9ce6-82086ae8584f)
 
 ![Image](https://github.com/user-attachments/assets/192e2a34-ea14-4985-a15d-34221001ced1)
