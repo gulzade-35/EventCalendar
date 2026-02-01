@@ -44,6 +44,8 @@ Context: Entity Framework veritabanı bağlantı ve tablo tanımlamaları.
 
 ![Image](https://github.com/user-attachments/assets/6eb86e77-e945-446b-9ce6-82086ae8584f)
 
+![Image](https://github.com/user-attachments/assets/192e2a34-ea14-4985-a15d-34221001ced1)
+
 ![Image](https://github.com/user-attachments/assets/9fb2ce00-e5a1-40a5-8673-3af286414464)
 
 ![Image](https://github.com/user-attachments/assets/37e85475-811c-49d5-8981-eda69c8735ef)
