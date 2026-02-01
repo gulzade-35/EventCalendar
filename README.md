@@ -27,11 +27,14 @@ Hızlı kullanıcı etkileşimlerinde veritabanına mükerrer (çift) kayıt at�
 Modal üzerinden silme ve güncelleme işlemlerinde karşılaşılan aria-hidden hataları ve "takılı kalan backdrop" sorunları, özel bir temizlik fonksiyonu (closeModalCleanly) ile çözülmüştür. İşlem sonrası odaklanılan element ve modal kalıntıları DOM'dan tamamen temizlenmektedir.
 
 🏗️ Kullanılan Teknolojiler
-Backend: ASP.NET MVC, Entity Framework (Code First), C#
-
-Frontend: FullCalendar v5+, jQuery, Bootstrap 4, AdminLTE 3
-
-Database: MS SQL Server
+|Katman / Amaç    | Teknoloji                   |
+|-------------    |------------------           |
+| Backend         | 	ASP.NET Core 6.0          |
+| API Tüketimi    | HttpClient / RapidAPI       |
+| JSON İşleme     | Newtonsoft.Json             |
+| Arayüz          | HTML, CSS, Bootstrap        |
+| Tema            | ThemeWagon Deluxe Teması    |
+| View Yapısı     | Razor View + ViewComponent  |
 
 📂 Proje Yapısı
 EventController: Etkinlik ve kategori verilerini JSON formatında sunan API katmanı.
